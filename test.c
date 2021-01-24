@@ -11,53 +11,54 @@
 
 int main(int argc, char **argv) {
 
-  char *input = malloc(CMDSIZE);
-  char *args[CMDPATH];
+  char *input = malloc(CMDSIZE); //taille max de la commande
+  char *args[CMDPATH]; //nombre d'argments max que l'utilisateur peux rentrer
+  char cwd[1024];
   int i=0;
   int j=0;
 
   for (;;) {
-    // protection du fork a faire
-    //fork();
     j = 0;
-    printf("$>");
+    getcwd(cwd,sizeof(cwd));
+    printf("%s$>",cwd);
     fgets(input, CMDSIZE, stdin);
-    fflush(stdin);
+    input[strlen(input)-1]='\0';
 
     char *arg = strtok(input, " ");
     while (arg != NULL){
         args[j++] = arg;
-        arg = strtok(NULL, " ");
+        arg = strtok(NULL, " "); //découpe les arguments saisie par l'utilisateur
     }
     args[j]=NULL;
 
-    if(strcmp(args[0], "exit")==0){
+    if(strcmp(args[0], "exit")==0){ //permet de quitter le terminal
 
       break;
+    }else if(strcmp(args[0], "cd")==0){
+      chdir(args[1]); //fonction en c permettant d'utiliser CD
+      continue;
+    }else if(strcmp(args[0], "help")==0){
+      args[0]="man";
     }
 
-    pid_t id = fork();
+    pid_t id = fork(); //sécurise le fork
 
     if(id>0){
       wait(NULL);
     }else if(id==0){
-      int err = execvp(args[0],args);
+      int err = execvp(args[0],args);//permet d'executer les arguments un par un rentrer par l'utilisateur
       if(err==-1){
-        perror("Erreur de commande");
+        perror("Erreur de commande"); //affiche ce message d'erreur pour une mauvaise commande
         exit(EXIT_FAILURE);
       }
     }else {
       printf("Erreur de fork");
       break;
     }
-//Rajouter un wait
-
-    //execvp( argv[position],&argv[position]);
-
   }
 
 
-free (input);
+  free (input);
   return 0;
 
 }
