@@ -1,4 +1,4 @@
-# OS
+# Mini Shell
 
 # Introduction à l'interface en ligne de commande
 Qu'est-ce qu'une ligne de commande ?
